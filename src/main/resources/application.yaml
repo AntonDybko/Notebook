@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: Notebook
+
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: notes
+      username: admin
+      password: password
+      authentication-database: admin
+      # uri: mongodb://admin:password@localhost:27017/myapp?authSource=admin
