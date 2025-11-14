@@ -7,6 +7,6 @@ spring:
       host: ${DB_HOST:localhost}
       port: ${DB_PORT:27017}
       database: ${DB_NAME:notes}
-      username: admin
-      password: password
-      authentication-database: admin
+      username: ${DB_USERNAME:admin}
+      password: ${DB_PASSWORD:password}
+      authentication-database: ${DB_AUTH_SOURCE:admin}

@@ -1,14 +1,25 @@
-# Build stage with Java 21
-FROM gradle:8.6-jdk21 AS build
+# Stage 1: Build the JAR file
+FROM gradle:8.8-jdk21 AS builder
 WORKDIR /app
-COPY build.gradle .
-COPY settings.gradle .
-COPY src ./src
+COPY . .
 RUN gradle clean build -x test
 
-# Runtime stage with Java 21
+# Stage 2: Extract the JAR file
+FROM amazoncorretto:21-alpine AS extractor
+WORKDIR extracted
+COPY --from=builder /app/build/libs/*.jar app.jar
+RUN java -Djarmode=layertools -jar app.jar extract
+
+# Stage 3: Create the final image
 FROM amazoncorretto:21-alpine
-WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+WORKDIR /application
+
+# Copy the resources and JAR layers
+COPY --from=extractor extracted/dependencies/ ./
+COPY --from=extractor extracted/spring-boot-loader/ ./
+COPY --from=extractor extracted/snapshot-dependencies/ ./
+COPY --from=extractor extracted/application/ ./
+
+# Expose port
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]

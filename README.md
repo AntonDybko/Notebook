@@ -1,7 +1,7 @@
 <h1>Notebook Application</h1>
 
 A Spring Boot REST API for managing notes with tagging, filtering, and text analysis features.
-Features
+Features:
 
     📝 Create, read, update, and delete notes
 
@@ -18,10 +18,8 @@ Features
 Prerequisites
 
   - Docker and Docker Compose installed on your system
-  - At least 2GB of free memory for containers
 
 Quick Start
-Method 1: Using Docker Compose (Recommended)
 
   - Clone or download the project to your local machine
   - Navigate to the project directory:

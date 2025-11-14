@@ -1,22 +1,23 @@
-version: '3.8'
-
 services:
-  # MongoDB database service
   mongodb:
     image: mongo:latest
     container_name: notebook-mongodb
     restart: unless-stopped
     environment:
-      MONGO_INITDB_DATABASE: notebook
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: notes
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    networks:
-      - notebook-network
+    healthcheck:
+      test: ["CMD", "mongosh", "-u", "admin", "-p", "password", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
-  # Notebook Spring Boot application
   notebook-app:
     build:
       context: .
@@ -24,18 +25,17 @@ services:
     container_name: notebook-app
     restart: unless-stopped
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/notebook
-      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: mongodb
+      DB_PORT: 27017
+      DB_NAME: notes
+      DB_USERNAME: admin
+      DB_PASSWORD: password
+      DB_AUTH_SOURCE: admin
     ports:
       - "8080:8080"
     depends_on:
-      - mongodb
-    networks:
-      - notebook-network
+      mongodb:
+        condition: service_healthy
 
 volumes:
   mongodb_data:
-
-networks:
-  notebook-network:
-    driver: bridge
