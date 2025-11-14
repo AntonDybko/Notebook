@@ -30,7 +30,7 @@ cd Notebook
 
 Start the application:
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 Wait for the containers to start. You should see output indicating:
 
